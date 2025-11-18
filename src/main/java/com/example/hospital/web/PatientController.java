@@ -1,8 +1,9 @@
 package com.example.hospital.web;
 
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 
 import com.example.hospital.repository.PatientRepository;
@@ -16,14 +17,23 @@ public class PatientController {
     @Autowired
     private PatientRepository patientRepository;
     @GetMapping("/index")
-    public String index(Model model) {
-        List<Patient> patients = patientRepository.findAll();
-        model.addAttribute("listPatients",patients);
+    public String index(Model model,@RequestParam(name="page",defaultValue = "0") int page,
+    @RequestParam(name="size",defaultValue = "5") int size,
+    @RequestParam(name = "keyword", defaultValue = "") String keyword) {
+        //Page<Patient> pagePatients = patientRepository.findAll(PageRequest.of(page, size));
+        Page<Patient> pagePatients = patientRepository.findByNomContainsIgnoreCaseOrPrenomContainsIgnoreCase(keyword,keyword,PageRequest.of(page, size));
+        //List<Patient> patients = patientRepository.findAll();
+        model.addAttribute("listPatients",pagePatients.getContent());
+        model.addAttribute("pages",new int[pagePatients.getTotalPages()]);
+        model.addAttribute("currentPage",page);
+        model.addAttribute("keyword", keyword);
+       // model.addAttribute("PatientsSize",patients.getSize());
+       // System.out.println(patients.getSize());
         return "patients";
     }
     @GetMapping("/deletePatient")
-    public String delete(@RequestParam(name = "id") Long id) {
+    public String delete(@RequestParam(name = "id") Long id, String keyword,int page) {
             patientRepository.deleteById(id);
-            return "redirect:/index";
+            return "redirect:/index?page="+page+"&keyword="+keyword;
     }
 }

@@ -16,7 +16,7 @@ public class HospitalApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HospitalApplication.class, args);
 	}
-    @Bean
+    //@Bean
 	public CommandLineRunner start(PatientRepository patientRepository) {
         //  return new CommandLineRunner() {
 		// 	@Override
