@@ -2,6 +2,7 @@ package com.example.hospital.security;
 
 import javax.sql.DataSource;
 
+import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -14,11 +15,16 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.example.hospital.security.service.UserDetailServiceImpl;
+
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
+@AllArgsConstructor
 public class SecurityConfig {
-    @Bean
+    
+    private UserDetailServiceImpl userDetailServiceImpl;
+    //@Bean
     public JdbcUserDetailsManager jdbcUserDetailsManager(DataSource dataSource) {
       return new JdbcUserDetailsManager(dataSource);
     }
@@ -43,6 +49,7 @@ public class SecurityConfig {
        //.authorizeHttpRequests(ar->ar.requestMatchers("/user/**").hasRole("USER"))
        .authorizeHttpRequests(ar->ar.anyRequest().authenticated())
        .exceptionHandling(eh->eh.accessDeniedPage("/notAuthorized"))
+       .userDetailsService(userDetailServiceImpl)
        .build();
     }
     
